@@ -1,0 +1,99 @@
+[
+  {
+    "title": "Why we use <br> element?",
+    "answers": [
+      "To make text bold.",
+      "To make text italic.",
+      "To add break line.",
+      "To make horizontal line."
+    ],
+    "right_answer": "To add break line.",
+    "lang": "en"
+  },
+  {
+    "title": "Is <img> element has attribute href?",
+    "answers": [
+      "Yes.",
+      "No, it's for anchor tag <a>.",
+      "All elements has this attribute.",
+      "Answers 1 and 3 are right."
+    ],
+    "right_answer": "No, it's for anchor tag <a>.",
+    "lang": "en"
+  },
+  {
+    "title": "How can we make element text bold?",
+    "answers": [
+      "Putting it inside <b> tag.",
+      "Putting it inside <strong> tag.",
+      "Customizing it with font-weight property in css.",
+      "All answers are right."
+    ],
+    "right_answer": "All answers are right.",
+    "lang": "en"
+  },
+  {
+    "title": "عالم مصري شهير على مستوى العالم، وحاصل على جائزة نوبل؛ فمن يكون؟",
+    "answers": ["على المشرفة", "أحمد زويل", "فاروق الباز"],
+    "right_answer": "أحمد زويل",
+    "lang": "ar"
+  },
+  {
+    "title": "What video game did Mario, the Nintendo character, first appear in?",
+    "answers": [
+      "Super Mario Bros.",
+      "Donkey Kong.",
+      "Mario Bros.",
+      "Mario's Bombs Away."
+    ],
+    "right_answer": "Donkey Kong.",
+    "lang": "en"
+  },
+  {
+    "title": "الغاز الذي يشكل حوالي 75 % من اجمالي كتلة الشمس هو…؟",
+    "answers": ["النتروجين", "الأوكسجين", "الهيدروجين", "الكالسيوم"],
+    "right_answer": "الهيدروجين",
+    "lang": "ar"
+  },
+  {
+    "title": "الماء الذي يتجمد على نحو أسرع عند وضعه في داخل الفريزرهو …؟",
+    "answers": [
+      "الماء البارد",
+      "الماء المعتدل",
+      "الماء الساخن",
+      "كلها في وقت واحد"
+    ],
+    "right_answer": "الماء الساخن",
+    "lang": "ar"
+  },
+  {
+    "title": "الطائر الوحيد الذي يستطيع تمييز اللون الأزرق هو ….؟",
+    "answers": ["الغراب", "البومة", "الضقر", "الهدهد"],
+    "right_answer": "البومة",
+    "lang": "ar"
+  },
+  {
+    "title": "What is part of a database that holds only one type of information?",
+    "answers": ["Report", "Field", "Record", "File"],
+    "right_answer": "Field",
+    "lang": "en"
+  },
+  {
+    "title": "ما أسم المدينة التي أسسها القائد العربي جوهر الصقلي؟",
+    "answers": ["مدينة القاهرة", "مدينة الكوفة", "مدينة بغداد"],
+    "right_answer": "مدينة القاهرة",
+    "lang": "ar"
+  },
+  {
+    "title": "Made from a variety of materials, such as carbon, which inhibits the flow of current...?",
+    "answers": ["Inductor", "Capacitor", "Resistor"],
+    "right_answer": "Resistor",
+    "lang": "en"
+  },
+  {
+    "title": "What is the game which won goty award for 2022?",
+    "answers": ["Elden Ring", "Elden Ring", "Elden Ring"],
+    "right_answer": "Elden Ring",
+    "lang": "en"
+  }
+]

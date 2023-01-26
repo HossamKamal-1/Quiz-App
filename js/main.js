@@ -1,29 +1,38 @@
+// HTML Elements Selection
 let questionsCountSpan = document.querySelector(".quiz-info .count span");
 let spansContainer = document.querySelector(".bullets .spans-container");
 let asnwersArea = document.querySelector(".answers-area");
 let secondsSpan = document.querySelector(".count-down .seconds");
 let minutesSpan = document.querySelector(".count-down .minutes");
+let questionArea = document.querySelector(".quiz-area h2");
+let submitAnswerBtn = document.getElementById("submit-btn");
 let questionCount = 7; // Number of questions to show
+
+// Decrement Counters + Increment Counters
 let questionVar = questionCount; // decrement counter
 let correctAnswerCount = 0; // increment correct answers
 let spansCounter = 0; // bullets counter
-let questionArea = document.querySelector(".quiz-area h2");
-let questionIndices; // array contains all indices of json file questions
-let showedQuestions = []; // all shown questions
-// count Down Timer
+let duration = 90;
+// Arrays
+let questionIndices; // array contains all indices of json object questions
+let wrongQuestions = []; // All Wrong Questions
+let wrongAnswersList = []; // All Wrong Answers
+
+// Count Down Timer
 let countDownInterval = setInterval(countDownTimeHandler, 1000);
 
 getQuestions().then((questionsArray) => {
-  createBullets(questionCount);
   questionIndices = Array.from(
     { length: questionsArray.length },
     (_, index) => index
   );
+  createBullets();
   addQuestion(questionsArray);
-  document
-    .getElementById("submit-btn")
-    .addEventListener("click", () => checkAnswer(questionsArray));
+  submitAnswerBtn.addEventListener("click", () =>
+    submitAnswerHandler(questionsArray)
+  );
 });
+
 function generateRandomQuestion(questionsArray) {
   let randomQuestionIndex = Math.floor(Math.random() * questionIndices.length);
   let selectedQuestion = questionsArray[questionIndices[randomQuestionIndex]];
@@ -32,42 +41,46 @@ function generateRandomQuestion(questionsArray) {
   );
   return selectedQuestion;
 }
-function generateRandomAnswer(answersLength, selectedQuestion, answersIndices) {
+
+function generateRandomAnswer(
+  totalNumberOfAnswers,
+  selectedQuestion,
+  answersIndices
+) {
   // answers indices have address of the array we can change it here
-  let randomAnswerIndex = Math.floor(Math.random() * answersLength);
+  let randomAnswerIndex = Math.floor(Math.random() * totalNumberOfAnswers);
   let selectedAnswerIndex = answersIndices[randomAnswerIndex];
   let selectedAnswer = selectedQuestion.answers[selectedAnswerIndex];
   answersIndices.splice(randomAnswerIndex, 1);
   return selectedAnswer;
 }
+
 function addQuestion(questionsArray) {
   questionArea.innerHTML = "";
   asnwersArea.innerHTML = "";
-  // get random Question
   if (questionVar > 0) {
     questionVar--;
+    // Generate Random Question
     let selectedQuestion = generateRandomQuestion(questionsArray);
-    showedQuestions.push(selectedQuestion);
     questionArea.textContent = selectedQuestion.title;
     if (selectedQuestion.lang == "ar") {
       document.body.classList.add("rtl");
     } else {
       document.body.classList.remove("rtl");
     }
+    let totalCountOfAns = selectedQuestion.answers.length;
     let answersIndices = Array.from(
-      { length: selectedQuestion.answers.length },
+      { length: totalCountOfAns },
       (_, index) => index
     );
-    let answersLength = selectedQuestion.answers.length;
     selectedQuestion.answers.forEach((_, index) => {
-      // generate Random Questionn
+      // Generate Random Answer
       let selectedAnswer = generateRandomAnswer(
-        answersLength--,
+        totalCountOfAns--,
         selectedQuestion,
         answersIndices // Memory Address
       );
-      console.log(answersIndices);
-      // Creating DOM answers Elements
+      // Creating DOM Answers Elements
       let answerDiv = document.createElement("div");
       answerDiv.className = "answer";
       // Creating radioInput
@@ -89,42 +102,60 @@ function addQuestion(questionsArray) {
     return;
   }
   // Questions Finished Show Results
-  showResult(countDownInterval);
+  showResult();
 }
-function checkAnswer(questionsArray) {
+
+function submitAnswerHandler(questionsArray) {
+  // Check Answer Correction
   let radioBtns = document.getElementsByName("answers");
   let currentQuestion = questionsArray.find(
     ({ title }) => title == questionArea.textContent
   );
-  console.log(currentQuestion.right_answer);
-  let checkRadio = Array.from(radioBtns).find((radioBtn) => radioBtn.checked);
-  if (currentQuestion.right_answer == checkRadio.dataset.answer) {
+  let checkedRadio = Array.from(radioBtns).find((radioBtn) => radioBtn.checked);
+  if (currentQuestion.right_answer == checkedRadio.dataset.answer) {
     correctAnswerCount++;
+  } else {
+    wrongAnswersList.push(checkedRadio.dataset.answer);
+    wrongQuestions.push(currentQuestion);
   }
+  // Move To Next Bullet + Add Next Quesion
   moveBullets();
   addQuestion(questionsArray);
 }
+
 function moveBullets() {
   let spansContainer = document.querySelector(".spans-container").children;
-  // Time finished make all spans enabled
-  if (!parseInt(minutesSpan.innerHTML) && !parseInt(secondsSpan.innerHTML)) {
+  // Time Finished Make All Bullets Enabled
+  if (!duration) {
     Array.from(spansContainer).forEach((span) => {
       span.classList.add("on");
       span.classList.remove("current");
     });
     return;
   }
-  //  submit answer [there is time]
+  // User Submit Answer [And There Is Time]
   spansContainer[spansCounter].classList.remove("current");
+  // If Reached Last Bullet Add Enabled Class
   if (spansCounter == questionCount - 1) {
     spansContainer[spansCounter].classList.add("on");
     return;
   }
+  // Not Last Bullet
   spansContainer[++spansCounter].classList.add("on");
   spansContainer[spansCounter].classList.add("current");
 }
-function showResult(countDownInterval) {
-  // stop time
+
+function createBullets() {
+  questionsCountSpan.innerHTML = questionCount;
+  for (let i = 0; i < questionCount; i++)
+    spansContainer.appendChild(document.createElement("span"));
+
+  // First Bullet Enabled And Faded-in
+  spansContainer.children[0].className = "on current";
+}
+
+function showResult() {
+  // Stop Time
   clearInterval(countDownInterval);
   questionArea.innerHTML = "";
   asnwersArea.innerHTML = "";
@@ -160,35 +191,26 @@ function showResult(countDownInterval) {
   );
   resultContainer.append(rankSpan, resultInfo);
   asnwersArea.appendChild(resultContainer);
-  removeEventListener("click", checkAnswer);
-  document.getElementById("submit-btn").remove();
-  console.log(showedQuestions);
+  submitAnswerBtn.removeEventListener("click", submitAnswerHandler);
+  submitAnswerBtn.remove();
+  // Logging Wrong Answered Questions + Wrong Answers Of These Questions
+  console.table(wrongQuestions);
+  console.table(wrongAnswersList);
 }
-function createBullets(numberOfQuestions) {
-  questionsCountSpan.innerHTML = numberOfQuestions;
-  for (let i = 0; i < numberOfQuestions; i++) {
-    spansContainer.appendChild(document.createElement("span"));
-  }
-  spansContainer.children[0].className = "on current";
-}
+
 function countDownTimeHandler() {
-  secondsSpan.innerHTML =
-    parseInt(secondsSpan.innerHTML) - 1 < 10
-      ? `0${parseInt(secondsSpan.innerHTML) - 1}`
-      : parseInt(secondsSpan.innerHTML) - 1;
-  if (!parseInt(secondsSpan.innerHTML) && parseInt(minutesSpan.innerHTML)) {
-    minutesSpan.innerHTML =
-      parseInt(minutesSpan.innerHTML) - 1 < 10
-        ? `0${parseInt(minutesSpan.innerHTML) - 1}`
-        : parseInt(minutesSpan.innerHTML) - 1;
-    secondsSpan.innerHTML = "59";
-  }
-  // time finished
-  if (!parseInt(secondsSpan.innerHTML) && !parseInt(minutesSpan.innerHTML)) {
-    showResult(countDownInterval);
+  duration--;
+  let minutes = parseInt(duration / 60);
+  let seconds = parseInt(duration % 60);
+  secondsSpan.innerHTML = seconds < 10 ? `0${seconds}` : seconds;
+  minutesSpan.innerHTML = minutes < 10 ? `0${minutes}` : minutes;
+  if (!duration) {
+    clearInterval(countDownInterval);
+    showResult();
     moveBullets();
   }
 }
+
 async function getQuestions() {
   try {
     return await new Promise((resolve, reject) => {

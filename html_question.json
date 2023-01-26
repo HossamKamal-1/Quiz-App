@@ -16,7 +16,7 @@
       "Yes.",
       "No, it's for anchor tag <a>.",
       "All elements has this attribute.",
-      "Answers 1 and 3 are right."
+      "No, it's for script <script> element"
     ],
     "right_answer": "No, it's for anchor tag <a>.",
     "lang": "en"
@@ -56,7 +56,7 @@
     "lang": "ar"
   },
   {
-    "title": "الماء الذي يتجمد على نحو أسرع عند وضعه في داخل الفريزرهو …؟",
+    "title": "الماء الذي يتجمد على نحو أسرع عند وضعه في داخل الفريزر هو …؟",
     "answers": [
       "الماء البارد",
       "الماء المعتدل",

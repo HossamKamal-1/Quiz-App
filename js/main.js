@@ -9,7 +9,7 @@ let correctAnswerCount = 0; // increment correct answers
 let spansCounter = 0; // bullets counter
 let questionArea = document.querySelector(".quiz-area h2");
 let questionIndices; // array contains all indices of json file questions
-
+let showedQuestions = []; // all shown questions
 // count Down Timer
 let countDownInterval = setInterval(countDownTimeHandler, 1000);
 
@@ -47,6 +47,7 @@ function addQuestion(questionsArray) {
   if (questionVar > 0) {
     questionVar--;
     let selectedQuestion = generateRandomQuestion(questionsArray);
+    showedQuestions.push(selectedQuestion);
     questionArea.textContent = selectedQuestion.title;
     if (selectedQuestion.lang == "ar") {
       document.body.classList.add("rtl");
@@ -161,6 +162,7 @@ function showResult(countDownInterval) {
   asnwersArea.appendChild(resultContainer);
   removeEventListener("click", checkAnswer);
   document.getElementById("submit-btn").remove();
+  console.log(showedQuestions);
 }
 function createBullets(numberOfQuestions) {
   questionsCountSpan.innerHTML = numberOfQuestions;

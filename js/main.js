@@ -194,8 +194,8 @@ function showResult() {
   submitAnswerBtn.removeEventListener("click", submitAnswerHandler);
   submitAnswerBtn.remove();
   // Logging Wrong Answered Questions + Wrong Answers Of These Questions
-  console.table(wrongQuestions);
-  console.table(wrongAnswersList);
+  // console.table(wrongQuestions);
+  // console.table(wrongAnswersList);
 }
 
 function countDownTimeHandler() {

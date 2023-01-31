@@ -1,37 +1,62 @@
 // HTML Elements Selection
-let questionsCountSpan = document.querySelector(".quiz-info .count span");
-let spansContainer = document.querySelector(".bullets .spans-container");
-let asnwersArea = document.querySelector(".answers-area");
-let secondsSpan = document.querySelector(".count-down .seconds");
-let minutesSpan = document.querySelector(".count-down .minutes");
-let questionArea = document.querySelector(".quiz-area h2");
-let submitAnswerBtn = document.getElementById("submit-btn");
-let questionCount = 7; // Number of questions to show
+let questionsCountSpan = document.querySelector(".quiz-info .count span"),
+  spansContainer = document.querySelector(".bullets .spans-container"),
+  asnwersArea = document.querySelector(".answers-area"),
+  secondsSpan = document.querySelector(".count-down .seconds"),
+  minutesSpan = document.querySelector(".count-down .minutes"),
+  questionArea = document.querySelector(".quiz-area h2"),
+  submitAnswerBtn = document.getElementById("submit-btn");
 
-// Decrement Counters + Increment Counters
-let questionVar = questionCount; // decrement counter
+let questionCount = 7, // Number of questions to show
+  questionVar = questionCount; // decrement counter
+
+// Increment Counters + exam Duration
 let correctAnswerCount = 0; // increment correct answers
 let spansCounter = 0; // bullets counter
 let duration = 90;
+// Count Down Interval
+let countDownInterval;
 // Arrays
-let questionIndices; // array contains all indices of json object questions
 let wrongQuestions = []; // All Wrong Questions
 let wrongAnswersList = []; // All Wrong Answers
+let questionIndices = []; // all indices of questions
 
-// Count Down Timer
-let countDownInterval = setInterval(countDownTimeHandler, 1000);
+getQuestions();
 
-getQuestions().then((questionsArray) => {
+async function getQuestions() {
+  try {
+    let questionsArray = await new Promise((resolve, reject) => {
+      let myRequest = new XMLHttpRequest();
+      myRequest.onload = function () {
+        if (this.readyState == 4 && this.status >= 200 && this.status < 300) {
+          resolve(JSON.parse(this.responseText));
+          return;
+        }
+        reject({ status: this.status, statusText: this.statusText });
+      };
+      myRequest.open("GET", "html_question.json", true);
+      myRequest.send();
+    });
+    setQuestionsAndStartTime(questionsArray);
+  } catch ({ status, statusText }) {
+    fireSweetAlert(`${status}: failed to connect api`, statusText, "error");
+  }
+}
+
+function setQuestionsAndStartTime(questions) {
   questionIndices = Array.from(
-    { length: questionsArray.length },
+    { length: questions.length },
     (_, index) => index
   );
+
   createBullets();
-  addQuestion(questionsArray);
+  addQuestion(questions);
+  // Count Down Timer
+  startCountdown();
   submitAnswerBtn.addEventListener("click", () =>
-    submitAnswerHandler(questionsArray)
+    submitAnswerHandler(questions)
   );
-});
+}
 
 function generateRandomQuestion(questionsArray) {
   let randomQuestionIndex = Math.floor(Math.random() * questionIndices.length);
@@ -47,21 +72,25 @@ function generateRandomAnswer(
   selectedQuestion,
   answersIndices
 ) {
+  // answersIndices points at the same array
   // answers indices have address of the array we can change it here
   let randomAnswerIndex = Math.floor(Math.random() * totalNumberOfAnswers);
   let selectedAnswerIndex = answersIndices[randomAnswerIndex];
   let selectedAnswer = selectedQuestion.answers[selectedAnswerIndex];
   answersIndices.splice(randomAnswerIndex, 1);
+  // splices changes the array itself
   return selectedAnswer;
 }
 
 function addQuestion(questionsArray) {
   questionArea.innerHTML = "";
   asnwersArea.innerHTML = "";
-  if (questionVar > 0) {
-    questionVar--;
+  if (questionVar-- > 0) {
     // Generate Random Question
-    let selectedQuestion = generateRandomQuestion(questionsArray);
+    let selectedQuestion = generateRandomQuestion(
+      questionsArray,
+      questionIndices
+    );
     questionArea.textContent = selectedQuestion.title;
     if (selectedQuestion.lang == "ar") {
       document.body.classList.add("rtl");
@@ -194,38 +223,38 @@ function showResult() {
   submitAnswerBtn.removeEventListener("click", submitAnswerHandler);
   submitAnswerBtn.remove();
   // Logging Wrong Answered Questions + Wrong Answers Of These Questions
-  // console.table(wrongQuestions);
-  // console.table(wrongAnswersList);
+  console.table(wrongQuestions);
+  console.table(wrongAnswersList);
 }
 
-function countDownTimeHandler() {
-  duration--;
-  let minutes = parseInt(duration / 60);
-  let seconds = parseInt(duration % 60);
-  secondsSpan.innerHTML = seconds < 10 ? `0${seconds}` : seconds;
-  minutesSpan.innerHTML = minutes < 10 ? `0${minutes}` : minutes;
-  if (!duration) {
-    clearInterval(countDownInterval);
-    showResult();
-    moveBullets();
+function startCountdown() {
+  countDownInterval = setInterval(countDownTimeHandler, 1000);
+
+  function countDownTimeHandler() {
+    duration--;
+    let minutes = parseInt(duration / 60);
+    let seconds = parseInt(duration % 60);
+    secondsSpan.innerHTML = seconds < 10 ? `0${seconds}` : seconds;
+    minutesSpan.innerHTML = minutes < 10 ? `0${minutes}` : minutes;
+    if (!duration) {
+      showResult();
+      moveBullets();
+    }
   }
 }
 
-async function getQuestions() {
-  try {
-    return await new Promise((resolve, reject) => {
-      let myRequest = new XMLHttpRequest();
-      myRequest.onload = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          resolve(JSON.parse(this.responseText));
-        } else {
-          reject([this.status, this.statusText]);
-        }
-      };
-      myRequest.open("GET", "html_question.json", true);
-      myRequest.send();
-    });
-  } catch (err) {
-    console.log(err[0], err[1]);
-  }
+function fireSweetAlert(
+  text,
+  title,
+  icon,
+  timer = 0,
+  showConfirmButton = true
+) {
+  Swal.fire({
+    icon,
+    text,
+    title,
+    timer,
+    showConfirmButton,
+  });
 }
